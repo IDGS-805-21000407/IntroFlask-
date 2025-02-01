@@ -1,0 +1,9 @@
+{% extends "layaut.html" %}
+
+{% block container %}
+    <h2>Hola {{titulo}}</h2>
+
+    {% for value in lista %}
+    <h3>{{value}}</h3>
+    {%endfor%}
+{% endblock %}
