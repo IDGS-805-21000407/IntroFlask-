@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block container %}
-   
+
 <form action="/resultado" method="post">
     <label for="nombre">N1:</label>
     <input type="text" name="n1">
@@ -10,6 +10,20 @@
     <label for="nombre">N2:</label>
     <input type="text" name="n2">
     <br>
+
+    <label for="suma">Suma</label>
+    <input type="radio" name="operacion" id="suma" value="suma"><br>
+
+    <label for="resta">Resta</label>
+    <input type="radio" name="operacion" id="resta" value="resta"><br>
+
+    <label for="division">División</label>
+    <input type="radio" name="operacion" id="division" value="division"><br>
+
+    <label for="multiplicacion">Multiplicación</label>
+    <input type="radio" name="operacion" id="multiplicacion" value="multiplicacion"><br>
+
+
     <input type="submit" value="Calcular">
 
 

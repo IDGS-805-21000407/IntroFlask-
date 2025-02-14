@@ -3,6 +3,8 @@ from flask import Flask, request
 from flask import Flask, render_template, request, url_for 
 from flask import Flask, render_template, request
 
+import forms
+
 
 
 app = Flask(__name__)
@@ -62,13 +64,23 @@ def OperaBas():
     return render_template('OperaBas.html')
 
 
-@app.route('/resultado', methods=["GET","POST"])
+@app.route('/resultado', methods=["POST"])
 def result():
-    if request.method == 'POST':
-        num1 = request.form.get('n1')
-        num2 = request.form.get('n2')
-        return "La multiplicacion de {} y {} es {}".format(num1, num2, str(int(num1)*int(num2)))
+    num1 = request.form.get('n1', type=int)
+    num2 = request.form.get('n2', type=int)
+    operacion = request.form.get('operacion')
     
+    operaciones = {
+        "suma": num1 + num2,
+        "resta": num1 - num2,
+        "multiplicacion": num1 * num2,
+        "division": "No se puede dividir por cero" if num2 == 0 else num1 / num2
+    }
+    
+    resultado = operaciones.get(operacion, "Operación no válida")
+    return f"El resultado de la {operacion} de {num1} y {num2} es {resultado}"
+
+
 #Cinepolis
 
 class Persona:
@@ -131,5 +143,25 @@ def Cinepolis():
     return render_template("Cinepolis.html", total_pagar=total_pagar, error=error)
 
 
+
+
+@app.route("/alumnos",methods=['GET','POST'])
+def alumnos():
+    mat=''
+    nom=''
+    ape=''
+    email=''
+    alumno_clase = forms.UserForm(request.form)
+    if request.method == 'POST':
+        mat = alumno_clase.matricula.data
+        nom=alumno_clase.nombre.data
+        ape=alumno_clase.apellido.data
+        email=alumno_clase.email.data
+        print("Nombre:{}".format(nom))
+        return render_template("alumnos.html",form=alumno_clase)
+    else:
+        return render_template("alumnos.html",form=alumno_clase)
+        
+    
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -1,7 +1,8 @@
-{% extends "layaut.html" %}
+{% extends "layout.html" %}
 
 {% block container %}
-    <h2>Hola, Ejemplo 1</h2>
-
-    
+    {%import "_macros.html" as macros %}
+    <h1>Ejemplo 1</h1>
+    macros.dato("Nombre", "Nombre") 
+    {{ macros.dato("Nombre", "password", "password") }}
 {% endblock %}
