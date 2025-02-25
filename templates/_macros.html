@@ -5,4 +5,17 @@
 {%macro campoNuevo(field)%}
 <td>{{field.label}}</td>
 <dd>{{field(**kwargs)|safe}}</dd>
+
+{%if field.errors%}
+<ul>
+    {%for error in field.errors%}
+    <li style="color: red;">{{error}}</li>
+    {%endfor%}
+</ul>
+{%endif%}
 {%endmacro%}
+
+{% macro mostrar_signo(nombre, imagen_url) %}
+    <h2>Tu signo zodiacal chino es: {{ nombre }}</h2>
+    <img src="{{ imagen_url }}" alt="Signo {{ nombre }}" width="100">
+{% endmacro %}

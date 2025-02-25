@@ -1,13 +1,15 @@
 from flask import Flask, render_template
 from flask import Flask, request
-from flask import Flask, render_template, request, url_for 
+from flask import Flask, render_template, request, url_for, flash
+from flask_wtf.csrf import CSRFProtect
 from flask import Flask, render_template, request
-
+from datetime import datetime
 import forms
-
-
+from flask import g
 
 app = Flask(__name__)
+app.secret_key = "secret"
+csrf=CSRFProtect()
 
 @app.route('/')
 def index():
@@ -144,24 +146,72 @@ def Cinepolis():
 
 
 
-
-@app.route("/alumnos",methods=['GET','POST'])
+@app.route("/alumnos", methods=['GET', 'POST'])
 def alumnos():
-    mat=''
-    nom=''
-    ape=''
-    email=''
-    alumno_clase = forms.UserForm(request.form)
-    if request.method == 'POST':
+    print("alumno:{}".format(g.nombre))
+    mat = ''
+    nom = ''
+    ape = ''
+    email = ''
+    alumno_clase=forms.UserForm(request.form)
+    if request.method == 'POST' and alumno_clase.validate():
         mat = alumno_clase.matricula.data
-        nom=alumno_clase.nombre.data
-        ape=alumno_clase.apellido.data
-        email=alumno_clase.email.data
-        print("Nombre:{}".format(nom))
-        return render_template("alumnos.html",form=alumno_clase)
-    else:
-        return render_template("alumnos.html",form=alumno_clase)
+        nom = alumno_clase.nombre.data
+        ape = alumno_clase.apellido.data
+        email = alumno_clase.email.data
+        #print("Nombre: {}".format(nom))
+        mensaje = 'Bienvenido {}'.format(nom)
+        flash(mensaje)
+    return render_template("alumnos.html", form=alumno_clase, mat=mat, nom=nom, ape=ape, email=email)
+
+signos_zodiaco_chino = [
+    "monkey", "rooster", "dog", "pig", "rat", "bull",
+    "tiger", "rabbit", "dragon", "snake", "horse", "sheep"  
+]
+
+def obtener_signo_chino(anio):
+    return signos_zodiaco_chino[anio % 12]
+
+@app.route('/Zodiaco', methods=['GET', 'POST'])
+def zodiaco():
+    nombre = ''
+    amaterno = ''
+    apaterno = ''
+    edad = None
+    signo = ''
+    imagen_signo = ''
+    form = forms.UserFormZodiaco(request.form)
+    if request.method == 'POST' and form.validate():
+        nombre = form.nombre.data
+        amaterno = form.amaterno.data
+        apaterno = form.apaterno.data
+        dia = int(form.dia.data)
+        mes = int(form.mes.data)
+        anio = int(form.anio.data)
+        hoy = datetime.today()
+        edad = hoy.year - anio - ((hoy.month, hoy.day) < (mes, dia))
+        signo = obtener_signo_chino(anio)
+        imagen_signo = f"img/{signo}.png"
+    return render_template("Zodiacochino.html", form=form, nombre=nombre, 
+                           amaterno=amaterno, apaterno=apaterno, 
+                           edad=edad, signo=signo, imagen_signo=imagen_signo)
+    
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+
+@app.before_request
+def before_request():
+    g.nombre="Pedro"
+    print("Before 1")
+    
+@app.after_request
+def after_request(response):
+    print("After 1")
+    return response
         
     
 if __name__ == '__main__':
+    csrf.init_app(app)
     app.run(debug=True, port=5000)
